@@ -4,8 +4,9 @@ require File.expand_path("../../config/environment", __FILE__)
 # Prevent database truncation if the environment is production
 abort("The Rails environment is running in production mode!") if Rails.env.production?
 require "rspec/rails"
-
 require "database_cleaner"
+
+Dir[Rails.root.join('spec/support/**/*.rb')].each {|f| require f}
 
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|
@@ -15,6 +16,9 @@ Shoulda::Matchers.configure do |config|
 end
 
 RSpec.configure do |config|
+  config.fixture_path = "#{::Rails.root}/spec/fixtures"
+  config.use_transactional_fixtures = true
+  
   config.include FactoryBot::Syntax::Methods
 
   config.before(:suite) do
@@ -27,4 +31,7 @@ RSpec.configure do |config|
       example.run
     end
   end
+  config.infer_spec_type_from_file_location!
+  config.include RequestSpecHelper
+  config.filter_rails_from_backtrace!  
 end
